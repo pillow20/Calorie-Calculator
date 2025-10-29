@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Калькулятор калорий и БЖУ</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding-bottom: 80px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+    h2 {
+      margin-top: 30px;
+      color: #34495e;
+      font-size: 1.4rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); }
+    .card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+    .card-content {
+      padding: 8px;
+      text-align: center;
+    }
+    .card-content h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #2c3e50;
+      line-height: 1.3;
+    }
+    .card-content p {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #27ae60;
+    }
+
+    #result {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(6px);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 12px;
+      font-size: 13px;
+      z-index: 1000;
+      max-width: 220px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .total-line {
+      margin: 3px 0;
+      font-weight: bold;
+    }
+    .calories { color: #27ae60; }
+    .proteins { color: #3498db; }
+    .fats { color: #e74c3c; }
+    .carbs { color: #f39c12; }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 16px;
+      color: #7f8c8d;
+      font-size: 14px;
+      border-top: 1px solid #eee;
+    }
+
+    @media (max-width: 360px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      }
+      #result {
+        max-width: 190px;
+        font-size: 12px;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Калькулятор калорий и БЖУ</h1>
+
+  <h2>🥣 Первые блюда</h2>
+  <div class="grid">
+    <div class="card" onclick="addItem({kcal:49, p:1.5, f:2.0, c:5.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Borscht_served.jpg" alt="Борщ">
+      <div class="card-content"><h3>Борщ</h3><p>49 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:66, p:3.0, f:2.5, c:8.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Pea_soup_with_sausage.jpg" alt="Суп гороховый">
+      <div class="card-content"><h3>Суп гороховый</h3><p>66 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:90, p:4.0, f:5.0, c:6.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0f/Solyanka.jpg" alt="Солянка">
+      <div class="card-content"><h3>Солянка</h3><p>90 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:55, p:2.0, f:1.5, c:8.5})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Shchi.jpg" alt="Щи">
+      <div class="card-content"><h3>Щи</h3><p>55 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:70, p:3.5, f:3.0, c:7.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Rassolnik.jpg" alt="Рассольник">
+      <div class="card-content"><h3>Рассольник</h3><p>70 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:60, p:2.8, f:2.2, c:7.5})">
+      <img src="https://cdn.7days.ru/pic/f59/979572/1430151/86.jpg" alt="Суп с фрикадельками">
+      <div class="card-content"><h3>Суп с фрикадельками</h3><p>60 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:50, p:2.0, f:1.8, c:6.0})">
+      <img src="https://img.povar.ru/main/99/e0/7c/ff/ovoshnoi_sup_klassicheskii-327375.JPG" alt="Овощной суп">
+      <div class="card-content"><h3>Овощной суп</h3><p>50 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:85, p:7.0, f:4.0, c:3.0})">
+      <img src="https://www.vsegdavkusno.ru/assets/images/recipes/1645/1.jpg" alt="Уха">
+      <div class="card-content"><h3>Уха</h3><p>85 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:110, p:5.0, f:6.0, c:8.0})">
+      <img src="https://chudopovar.com/images/sup-harcho.jpg" alt="Харчо">
+      <div class="card-content"><h3>Харчо</h3><p>110 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <h2>🍽 Вторые блюда</h2>
+  <div class="grid">
+    <div class="card" onclick="addItem({kcal:180, p:6.0, f:8.0, c:20.0})">
+      <img src="https://www.foodiesfeed.com/wp-content/uploads/2023/04/plov-uzbek-rice.jpg" alt="Плов">
+      <div class="card-content"><h3>Плов</h3><p>180 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:150, p:12.0, f:5.0, c:15.0})">
+      <img src="https://images.pexels.com/photos/1624478/pexels-photo-1624478.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt="Гречка с курицей">
+      <div class="card-content"><h3>Гречка с курицей</h3><p>150 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:230, p:10.0, f:12.0, c:18.0})">
+      <img src="https://www.chefmarket.ru/blog/wp-content/uploads/2020/07/russian-meat-dumplings-2000x1200.jpg" alt="Пельмени">
+      <div class="card-content"><h3>Пельмени</h3><p>230 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:242, p:8.0, f:13.0, c:22.0})">
+      <img src="https://images.pexels.com/photos/958536/pexels-photo-958536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt="Шаурма">
+      <div class="card-content"><h3>Шаурма</h3><p>242 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:130, p:18.0, f:3.5, c:0.5})">
+      <img src="https://images.pexels.com/photos/1671479/pexels-photo-1671479.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt="Куриная отбивная">
+      <div class="card-content"><h3>Куриная отбивная</h3><p>130 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:160, p:14.0, f:7.0, c:10.0})">
+      <img src="https://images.pexels.com/photos/1565982/pexels-photo-1565982.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt="Рыба на пару">
+      <div class="card-content"><h3>Рыба на пару</h3><p>160 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:190, p:9.0, f:10.0, c:15.0})">
+      <img src="https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" alt="Макароны с сыром">
+      <div class="card-content"><h3>Макароны с сыром</h3><p>190 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:140, p:16.0, f:5.0, c:8.0})">
+      <img src="https://www.vsegdavkusno.ru/assets/images/recipes/2968/image_1460/tushenaya-govyadina-s-ovoshami2.jpg" alt="Тушеная говядина">
+      <div class="card-content"><h3>Тушеная говядина</h3><p>140 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:120, p:15.0, f:6.0, c:5.0})">
+      <img src="https://img1.russianfood.com/dycontent/images_upl/551/big_550152.jpg" alt="Котлеты паровые">
+      <div class="card-content"><h3>Котлеты паровые</h3><p>120 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:110, p:3.0, f:2.0, c:20.0})">
+      <img src="https://img.delo-vcusa.ru/2017/11/Kartoshka-po-derevenski-v-duhovke.jpg" alt="Запечённая картошка">
+      <div class="card-content"><h3>Запечённая картошка</h3><p>110 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:150, p:10.0, f:11.0, c:2.0})">
+      <img src="https://prostoway.com/wp-content/uploads/2022/08/omlet-s-sirom.jpg" alt="Омлет">
+      <div class="card-content"><h3>Омлет</h3><p>150 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <h2>🥗 Салаты</h2>
+  <div class="grid">
+    <!-- ✅ Исправлено: Овощной салат — 25 ккал -->
+    <div class="card" onclick="addItem({kcal:25, p:1.0, f:0.2, c:4.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Vegetable_Salad.jpg" alt="Овощной салат">
+      <div class="card-content"><h3>Овощной салат</h3><p>25 ккал / 100г</p></div>
+    </div>
+    <!-- ✅ Оливье остаётся отдельно -->
+    <div class="card" onclick="addItem({kcal:197, p:6.0, f:14.0, c:12.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Vegetable_Salad.jpg" alt="Оливье">
+      <div class="card-content"><h3>Оливье</h3><p>197 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:120, p:3.0, f:8.0, c:7.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Chicken_Salad.jpg" alt="Салат с курицей">
+      <div class="card-content"><h3>Салат с курицей</h3><p>120 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:80, p:2.0, f:5.0, c:6.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Crab_Stick_Salad.jpg" alt="Салат с крабовыми палочками">
+      <div class="card-content"><h3>Салат с крабовыми палочками</h3><p>80 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:160, p:6.0, f:14.0, c:3.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Egg_Salad.jpg" alt="Салат с яйцом и майонезом">
+      <div class="card-content"><h3>Салат с яйцом и майонезом</h3><p>160 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:140, p:12.0, f:8.0, c:5.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Caesar_salad_%282%29.jpg" alt="Салат Цезарь">
+      <div class="card-content"><h3>Салат Цезарь</h3><p>140 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <h2>🥪 Бутерброды</h2>
+  <div class="grid">
+    <div class="card" onclick="addItem({kcal:250, p:10.0, f:12.0, c:25.0})">
+      <img src="https://vilkin.pro/wp-content/uploads/2018/08/buterbrody-s-kopchenoi-kolbasoi.jpg" alt="Бутерброд с колбасой">
+      <div class="card-content"><h3>С колбасой</h3><p>250 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:280, p:12.0, f:15.0, c:22.0})">
+      <img src="https://art-lunch.ru/content/uploads/2021/02/goryachiy-buterbrod-s-syrom-001.jpg" alt="Бутерброд с сыром">
+      <div class="card-content"><h3>С сыром</h3><p>280 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:220, p:9.0, f:10.0, c:20.0})">
+      <img src="https://www.photorecept.ru/wp-content/uploads/2022/02/buterbrod-s-jajcom-1-e1646069060552.jpg" alt="С яйцом">
+      <div class="card-content"><h3>С яйцом</h3><p>220 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:300, p:14.0, f:18.0, c:20.0})">
+      <img src="https://www.chefmarket.ru/blog/wp-content/uploads/2021/01/open-sandwich-or-toast-2000x1200.jpg" alt="С авокадо и лососем">
+      <div class="card-content"><h3>Авокадо + лосось</h3><p>300 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <h2>🥤 Напитки</h2>
+  <div class="grid">
+    <div class="card" onclick="addItem({kcal:42, p:0.1, f:0.0, c:10.5})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/Orange_Juice_1.jpg" alt="Апельсиновый сок">
+      <div class="card-content"><h3>Апельсиновый сок</h3><p>42 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:45, p:0.3, f:0.1, c:11.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/8e/Apple_juice.jpg" alt="Яблочный сок">
+      <div class="card-content"><h3>Яблочный сок</h3><p>45 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:54, p:0.1, f:0.0, c:13.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Coca-Cola_glass_bottle.jpg" alt="Кола">
+      <div class="card-content"><h3>Кола</h3><p>54 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:35, p:3.0, f:0.2, c:4.8})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Milk_glass.jpg" alt="Молоко 2.5%">
+      <div class="card-content"><h3>Молоко 2.5%</h3><p>35 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:28, p:0.5, f:0.0, c:7.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7e/Kefir_in_glass.jpg" alt="Кефир 1%">
+      <div class="card-content"><h3>Кефир 1%</h3><p>28 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:65, p:2.5, f:2.0, c:9.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Hot_chocolate.jpg" alt="Какао с молоком">
+      <div class="card-content"><h3>Какао с молоком</h3><p>65 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:3, p:0.1, f:0.0, c:0.7})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Green_tea_with_lemon.jpg" alt="Зелёный чай с лимоном">
+      <div class="card-content"><h3>Зелёный чай</h3><p>3 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:90, p:3.0, f:2.5, c:14.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/1e/Milkshake.jpg" alt="Молочный коктейль">
+      <div class="card-content"><h3>Молочный коктейль</h3><p>90 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:50, p:1.0, f:0.3, c:11.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/9e/Strawberry_smoothie.jpg" alt="Смузи клубничный">
+      <div class="card-content"><h3>Смузи клубничный</h3><p>50 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:45, p:0.0, f:0.0, c:11.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/Energy_drink_can.jpg" alt="Энергетик">
+      <div class="card-content"><h3>Энергетик</h3><p>45 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:42, p:0.5, f:0.0, c:3.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Glass_of_beer.jpg" alt="Пиво светлое">
+      <div class="card-content"><h3>Пиво (светлое)</h3><p>42 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <!-- Хлеб — в самом низу -->
+  <h2>🍞 Хлеб</h2>
+  <div class="grid">
+    <div class="card" onclick="addItem({kcal:250, p:8.0, f:3.0, c:45.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/7/7d/Sliced_white_bread.jpg" alt="Хлеб белый">
+      <div class="card-content"><h3>Хлеб белый</h3><p>250 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:210, p:7.0, f:2.5, c:40.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/1/13/Rye_bread_loaf.jpg" alt="Хлеб ржаной">
+      <div class="card-content"><h3>Хлеб ржаной</h3><p>210 ккал / 100г</p></div>
+    </div>
+    <div class="card" onclick="addItem({kcal:220, p:9.0, f:2.8, c:42.0})">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Wholemeal_bread_loaf.jpg" alt="Хлеб цельнозерновой">
+      <div class="card-content"><h3>Хлеб цельнозерновой</h3><p>220 ккал / 100г</p></div>
+    </div>
+  </div>
+
+  <div id="result">
+    <div class="total-line calories">Калории: 0 ккал</div>
+    <div class="total-line proteins">Белки: 0 г</div>
+    <div class="total-line fats">Жиры: 0 г</div>
+    <div class="total-line carbs">Углеводы: 0 г</div>
+    <p style="margin: 6px 0 0; font-size: 11px; color: #7f8c8d;">
+      Норма: М ~2500, Ж ~2000 ккал
+    </p>
+  </div>
+
+  <footer>
+    © 2025 Агафонов Алексей
+  </footer>
+
+  <script>
+    let total = { kcal: 0, p: 0, f: 0, c: 0 };
+
+    function addItem(item) {
+      total.kcal += item.kcal;
+      total.p += item.p;
+      total.f += item.f;
+      total.c += item.c;
+      updateResult();
+    }
+
+    function updateResult() {
+      document.getElementById('result').innerHTML = `
+        <div class="total-line calories">Калории: ${Math.round(total.kcal)} ккал</div>
+        <div class="total-line proteins">Белки: ${total.p.toFixed(1)} г</div>
+        <div class="total-line fats">Жиры: ${total.f.toFixed(1)} г</div>
+        <div class="total-line carbs">Углеводы: ${total.c.toFixed(1)} г</div>
+        <p style="margin: 6px 0 0; font-size: 11px; color: #7f8c8d;">
+          Норма: М ~2500, Ж ~2000 ккал
+        </p>
+      `;
+    }
+  </script>
+</body>
+</html>
